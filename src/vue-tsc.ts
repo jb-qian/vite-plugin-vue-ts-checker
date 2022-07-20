@@ -30,6 +30,7 @@ process.on('message', (data: { changeFile: string; deleteFile: string }) => {
 });
 
 function addVueFilesToAllowExtensions(tsc: string, proxyPath: string) {
+    // add *.vue files to allow extensions
     tsc = tsc.replace(
         `ts.supportedTSExtensions = [[".ts", ".tsx", ".d.ts"], [".cts", ".d.cts"], [".mts", ".d.mts"]];`,
         `ts.supportedTSExtensions = [[".ts", ".tsx", ".d.ts"], [".cts", ".d.cts"], [".mts", ".d.mts"], [".vue", ".md", ".html"]];`,
@@ -45,10 +46,6 @@ function addVueFilesToAllowExtensions(tsc: string, proxyPath: string) {
 
     // proxy createProgram apis
     tsc = tsc.replace(
-        `function createIncrementalProgram(_a) {`,
-        `function createIncrementalProgram(_a) { console.error('incremental mode is not yet supported'); throw 'incremental mode is not yet supported';`,
-    );
-    tsc = tsc.replace(
         `function createProgram(rootNamesOrOptions, _options, _host, _oldProgram, _configFileParsingDiagnostics) {`,
         `function createProgram(rootNamesOrOptions, _options, _host, _oldProgram, _configFileParsingDiagnostics) { return require(${JSON.stringify(proxyPath)}).createProgramProxy(...arguments);`,
     );
@@ -63,6 +60,7 @@ function addVueFilesToAllowExtensions(tsc: string, proxyPath: string) {
         `ts.dumpTracingLegend = tracingEnabled.dumpLegend;`,
         `ts.dumpTracingLegend = require(${JSON.stringify(proxyPath)}).loadTsLib().dumpTracingLegend;`,
     );
+
     // 替换输出文案方法
     tsc = tsc.replace(
         `ts.formatDiagnosticsWithColorAndContext = formatDiagnosticsWithColorAndContext;`,
