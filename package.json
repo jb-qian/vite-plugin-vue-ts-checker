@@ -1,6 +1,6 @@
 {
     "name": "@ks-operation/vite-plugin-vue-ts-checker",
-    "version": "0.0.6-beta.8",
+    "version": "0.0.7",
     "description": "vue-tsc vite plugin",
     "main": "./dist/index.js",
     "types": "./@types",
