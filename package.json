@@ -1,0 +1,33 @@
+{
+    "name": "@ks-operation/vite-plugin-vue-ts-checker",
+    "version": "0.0.6-beta.8",
+    "description": "vue-tsc vite plugin",
+    "main": "./dist/index.js",
+    "types": "./@types",
+    "scripts": {
+        "build": "rm -rf dist && rm -rf @types && tsc",
+        "publish": "npm run build && npm publish",
+        "publish-ks": "npm run build && npm publish --registry https://npm.corp.kuaishou.com",
+        "publish-ks:beta": "npm run build && npm publish --tag beta --registry https://npm.corp.kuaishou.com",
+        "postinstall": "node scripts/index.js"
+    },
+    "keywords": [
+        "vue",
+        "ts",
+        "checker",
+        "typescript",
+        "vue-tsc"
+    ],
+    "repository": "npm/npm",
+    "author": "songqian",
+    "license": "ISC",
+    "devDependencies": {
+        "@types/node": "^16.9.2",
+        "typescript": "latest",
+        "vite": "^2.9.13"
+    },
+    "dependencies": {
+        "fs-extra": "^10.1.0",
+        "compare-versions": "^4.1.3"
+    }
+}
