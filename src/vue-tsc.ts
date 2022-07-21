@@ -1,7 +1,6 @@
 const fs = require('fs');
 
 const readFileSync = fs.readFileSync;
-const watchFile = fs.watchFile;
 const tscPath = require.resolve('typescript/lib/tsc');
 const proxyPath = require.resolve('./proxy');
 const formatDiagnosticsWithColorAndContextPath = require.resolve('./restructure/formatDiagnosticsWithColorAndContext');
@@ -108,22 +107,6 @@ fs.readFileSync = (...args: string[]) => {
     }
 
     return check(filePath, ...args);
-};
-
-function debounce(func: { apply: (arg0: any, arg1: any[]) => void; }, wait = 30) {
-	let timer: NodeJS.Timeout | null = null;
-	return (...params: any) => {
-		timer && clearTimeout(timer);
-		timer = setTimeout(() => {
-			func.apply(null, params);
-		}, wait);
-	};
-}
-
-fs.watchFile = (...args: any[]) => {
-    const arg1 = args[1];
-    const isFn = typeof arg1 === 'function';
-    watchFile(args[0], isFn ? debounce(arg1) : arg1, isFn ? undefined : debounce(args[2]));
 };
 
 require(tscPath);
