@@ -1,6 +1,6 @@
 {
     "name": "@ks-operation/vite-plugin-vue-ts-checker",
-    "version": "0.0.8",
+    "version": "0.0.9",
     "description": "vue-tsc vite plugin",
     "main": "./dist/index.js",
     "types": "./@types",
@@ -9,7 +9,7 @@
         "publish-npm": "npm run build && npm publish",
         "publish-ks": "npm run build && npm publish --registry https://npm.corp.kuaishou.com",
         "publish-ks:beta": "npm run build && npm publish --tag beta --registry https://npm.corp.kuaishou.com",
-        "postinstall": "node scripts/index.js"
+        "install:m": "node scripts/index.js --version=0.38.9"
     },
     "keywords": [
         "vue",
