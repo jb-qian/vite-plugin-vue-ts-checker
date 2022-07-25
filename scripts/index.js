@@ -45,6 +45,9 @@ function updateError() {
 function install() {
     console.log('');
     console.log(`🤖\u001b[36m Installing @volar/vue-typescript@${originVolarTypescriptVersion}${resetEscapeSequence}`);
+    try {
+        fs.removeSync(npmPath);
+    } catch (error) {}
     fs.mkdirSync(npmPath);
     createNpmPackage();
     installVolarVersion(originVolarTypescriptVersion);
@@ -62,7 +65,6 @@ if (!localVolarTypescriptVersion) {
     if (code === 1 || code === -1) { // 有不同的版本，可能是更新的，也可能是回退
         console.log('');
         console.log(`🔎\u001b[36m Find a new version @${originVolarTypescriptVersion}${resetEscapeSequence}`);
-        fs.removeSync(npmPath);
         install();
         updateSuccess();
     } else { // 已经是最新版本
