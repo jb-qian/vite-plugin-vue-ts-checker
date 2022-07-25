@@ -3,7 +3,7 @@ const { execSync } = require('child_process');
 const { npmPath } = require('./const');
 
 function installVolarVersion(version) {
-    return execSync(`cd ${npmPath} && npm i -D @volar/vue-typescript@${version}`, { shell: true });
+    return execSync(`npm i @volar/vue-typescript@${version}`, { shell: true, cwd: npmPath });
 }
 
 module.exports = {
