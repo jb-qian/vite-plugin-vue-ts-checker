@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 const readFileSync = fs.readFileSync;
-const tscPath = require.resolve('../vue-ts-checker-npm-modules/node_modules/typescript/lib/tsc');
+const tscPath = require.resolve('typescript/lib/tsc');
 const proxyPath = require.resolve('../vue-ts-checker-npm-modules/node_modules/vue-tsc/out/proxy');
 const formatDiagnosticsWithColorAndContextPath = require.resolve('./restructure/formatDiagnosticsWithColorAndContext');
 const createWatchStatusReporterPath = require.resolve('./restructure/createWatchStatusReporter');
