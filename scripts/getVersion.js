@@ -1,8 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const { execSync } = require('child_process');
-
-const { npmPath } = require('./const');
+const { npmPath, moduleName, registry } = require('./const');
 
 function stringToArray(str) {
     try {
@@ -12,8 +11,8 @@ function stringToArray(str) {
     }
 }
 
-function getLocalVolarTypescriptVersion() {
-    const package = path.join(npmPath, 'node_modules/@volar/vue-typescript/package.json');
+function getLocalVersion() {
+    const package = path.join(npmPath, `node_modules/${moduleName}/package.json`);
     if (!fs.pathExistsSync(package)) {
         return;
     }
@@ -21,8 +20,8 @@ function getLocalVolarTypescriptVersion() {
     return data.version;
 }
 
-function getOriginVolarTypescriptVersion() {
-    const data = execSync('npm view @volar/vue-typescript versions --json --registry https://registry.npmjs.org', { shell: true });
+function getOriginVersion() {
+    const data = execSync(`npm view ${moduleName} versions --json --registry ${registry}`, { shell: true });
     const array = stringToArray(data);
     const versions = Array.isArray(array) ? array.filter(Boolean) : [];
     const originVersion = versions[versions.length - 1];
@@ -30,6 +29,6 @@ function getOriginVolarTypescriptVersion() {
 }
 
 module.exports = {
-    getLocalVolarTypescriptVersion,
-    getOriginVolarTypescriptVersion,
+    getLocalVersion,
+    getOriginVersion,
 }
