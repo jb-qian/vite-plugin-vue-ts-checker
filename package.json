@@ -6,9 +6,7 @@
     "types": "./@types",
     "scripts": {
         "build": "rm -rf dist && rm -rf @types && tsc",
-        "publish-npm": "npm run build && npm publish",
-        "publish-ks": "npm run build && npm publish --registry https://npm.corp.kuaishou.com",
-        "publish-ks:beta": "npm run build && npm publish --tag beta --registry https://npm.corp.kuaishou.com"
+        "publish-npm": "npm run build && npm publish"
     },
     "keywords": [
         "vue",
