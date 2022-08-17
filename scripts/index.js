@@ -21,7 +21,6 @@ const params = process.argv.slice(2).reduce((prev, current) => {
     return prev;
 }, {});
 
-console.log('');
 const spinner = ora(`Checking ${moduleName} version...`).start();
 
 const {
