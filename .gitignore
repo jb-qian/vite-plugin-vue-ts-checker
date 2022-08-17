@@ -2,3 +2,4 @@ node_modules
 dist
 @types
 vue-ts-checker-npm-modules
+publish*.sh

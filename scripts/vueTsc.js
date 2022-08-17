@@ -80,11 +80,12 @@ function save(filePath, value) {
 }
 
 function check(filePath, ...args) {
-    if (cache.has(filePath)) {
-        return cache.get(filePath);
-    }
+    // if (cache.has(filePath)) {
+    //     return cache.get(filePath);
+    // }
     const value = readFileSync(...args);
-    return save(filePath, value);
+    // return save(filePath, value);
+    return value;
 }
 
 // 重写 readFileSync
@@ -100,11 +101,11 @@ fs.readFileSync = (...args) => {
         return save(filePath, value);
     }
 
-    if (changeFiles.includes(filePath)) {
-        changeFiles = changeFiles.filter((file) => file === filePath);
-        const value = readFileSync(...args);
-        return save(filePath, value);
-    }
+    // if (changeFiles.includes(filePath)) {
+    //     changeFiles = changeFiles.filter((file) => file === filePath);
+    //     const value = readFileSync(...args);
+    //     return save(filePath, value);
+    // }
 
     return check(filePath, ...args);
 };

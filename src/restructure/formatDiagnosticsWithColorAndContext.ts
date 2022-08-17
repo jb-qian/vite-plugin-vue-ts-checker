@@ -63,8 +63,9 @@ function getTrueLength(str: string){
 function createErrorMessage(file: ts.SourceFileLike, start: number, length: number, host: ts.FormatDiagnosticsHost) {
     const first = ts.getLineAndCharacterOfPosition(file, start);
     const last = ts.getLineAndCharacterOfPosition(file, start + length);
+    const fileLength = file.text.match(/\n/g)?.length || 0;
     const firstLine = Math.max(first.line - 2, 0);
-    const lastLine = last.line + 2;
+    const lastLine = Math.min(last.line + 2, fileLength);
     const centerLine = last.line;
     const firstLineChar = first.character;
     const contexts: ErrorMessageText[] = [];
@@ -73,7 +74,7 @@ function createErrorMessage(file: ts.SourceFileLike, start: number, length: numb
     for (let i = firstLine; i <= lastLine; i++) {
         const lineStart = ts.getPositionOfLineAndCharacter(file, i, 0);
         const lineEnd = i < lastLineInFile ? ts.getPositionOfLineAndCharacter(file, i + 1, 0) : file.text.length;
-        const lineContent = trimStringEnd(file.text.slice(lineStart, lineEnd)).replace(/\t/g, spaceString);
+        const lineContent = trimStringEnd(file.text.slice(lineStart, lineEnd)).replace(/\t/g, spaceString) || '...';
         const len = Math.max((lastLine + 1).toString().length - (i + 1).toString().length, 0);
         const indent = getIndents(i, centerLine).concat(spaceString.repeat(len)).reverse().join('');
         contexts.push({
