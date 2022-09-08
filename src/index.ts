@@ -59,17 +59,17 @@ export default function VitePlugin(options?: {
         name: VITE_PLUGIN_VUE_TSC_CHECKER,
         configureServer({ watcher, ws, restart }: ViteDevServer) {
             if (devTsc) {
-                devTsc?.kill();
+                devTsc.kill?.();
             }
             devTsc = script(true);
             devTsc.on('message', (error: any) => {
                 if (error) {
-                    ws.send({
+                    ws?.send?.({
                         type: 'error',
                         err: error,
                     });
                 } else {
-                    ws.send({
+                    ws?.send?.({
                         type: 'update',
                         updates: [],
                     });
@@ -103,7 +103,11 @@ export default function VitePlugin(options?: {
                 devTsc?.send({ deleteFile: path });
             });
             watcher.on('error', () => {
-                devTsc?.kill();
+                devTsc?.kill?.();
+                devTsc = null;
+            });
+            process.on('exit', () => {
+                devTsc?.kill?.();
                 devTsc = null;
             });
         },
