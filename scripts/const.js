@@ -2,7 +2,7 @@ const path = require('path');
 
 const npmPath = path.join(__dirname, '../vue-ts-checker-npm-modules');
 
-const typescriptPath = path.join(__dirname, '../vue-ts-checker-npm-modules/node_modules/typescript');
+const typescriptPath = path.join(npmPath, 'node_modules/typescript');
 
 const moduleName = 'vue-tsc';
 

@@ -3,15 +3,15 @@ const fs = require('fs');
 const readFileSync = fs.readFileSync;
 const tscPath = require.resolve('typescript/lib/tsc');
 const proxyPath = require.resolve('../vue-ts-checker-npm-modules/node_modules/vue-tsc/out/proxy');
-const formatDiagnosticsWithColorAndContextPath = require.resolve('./restructure/formatDiagnosticsWithColorAndContext');
-const createWatchStatusReporterPath = require.resolve('./restructure/createWatchStatusReporter');
+const formatDiagnosticsWithColorAndContextPath = require.resolve('../dist/restructure/formatDiagnosticsWithColorAndContext');
+const createWatchStatusReporterPath = require.resolve('../dist/restructure/createWatchStatusReporter');
 
 const cache = new Map();
 
 // 修改的文件数据
-let changeFiles: string[] = [];
+let changeFiles = [];
 
-process.on('message', (data: { changeFile: string; deleteFile: string }) => {
+process.on('message', (data) => {
     if (!changeFiles.includes(data.changeFile)) {
         changeFiles = [
             ...changeFiles,
@@ -28,7 +28,7 @@ process.on('message', (data: { changeFile: string; deleteFile: string }) => {
     }
 });
 
-function addVueFilesToAllowExtensions(tsc: string, proxyPath: string) {
+function addVueFilesToAllowExtensions(tsc, proxyPath) {
     // add *.vue files to allow extensions
     tsc = tsc.replace(
         `ts.supportedTSExtensions = [[".ts", ".tsx", ".d.ts"], [".cts", ".d.cts"], [".mts", ".d.mts"]];`,
@@ -74,21 +74,22 @@ function addVueFilesToAllowExtensions(tsc: string, proxyPath: string) {
     return tsc;
 }
 
-function save(filePath: string, value: string) {
+function save(filePath, value) {
     cache.set(filePath, value);
     return value;
 }
 
-function check(filePath: string, ...args: string[]): string {
-    if (cache.has(filePath)) {
-        return cache.get(filePath);
-    }
+function check(filePath, ...args) {
+    // if (cache.has(filePath)) {
+    //     return cache.get(filePath);
+    // }
     const value = readFileSync(...args);
-    return save(filePath, value);
+    // return save(filePath, value);
+    return value;
 }
 
 // 重写 readFileSync
-fs.readFileSync = (...args: string[]) => {
+fs.readFileSync = (...args) => {
     // 路径
     const filePath = args[0];
 
@@ -100,11 +101,11 @@ fs.readFileSync = (...args: string[]) => {
         return save(filePath, value);
     }
 
-    if (changeFiles.includes(filePath)) {
-        changeFiles = changeFiles.filter((file: string) => file === filePath);
-        const value = readFileSync(...args);
-        return save(filePath, value);
-    }
+    // if (changeFiles.includes(filePath)) {
+    //     changeFiles = changeFiles.filter((file) => file === filePath);
+    //     const value = readFileSync(...args);
+    //     return save(filePath, value);
+    // }
 
     return check(filePath, ...args);
 };

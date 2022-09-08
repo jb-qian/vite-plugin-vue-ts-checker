@@ -4,6 +4,13 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { CHECKER_JSON_FILENAME, VITE_PLUGIN_VUE_TSC_CHECKER } from './const';
 
+import { dirname } from 'path'
+import { fileURLToPath } from 'url'
+
+const _dirname = typeof __dirname !== 'undefined'
+  ? __dirname
+  : dirname(fileURLToPath(import.meta.url))
+
 /**
  * 过滤文件
  * @param path 路径
@@ -21,7 +28,7 @@ const isTransformFile = (path: string) => {
 const script = (isWatch: boolean) => {
     const hasCheckerJson = fs.existsSync(path.join(process.cwd(), CHECKER_JSON_FILENAME));
     return fork(
-        path.join(__dirname, './vue-tsc.js'),
+        path.join(_dirname, '../scripts/vueTsc.js'),
         [
             '-p',
             hasCheckerJson ? CHECKER_JSON_FILENAME : 'tsconfig.json',
@@ -44,7 +51,7 @@ export default function VitePlugin(options?: {
 }) {
     // 检查版本
     spawnSync('node', [
-        path.join(__dirname, '../scripts/index.js'),
+        path.join(_dirname, '../scripts/index.js'),
         options?.volar.version ? `--version=${options.volar.version}` : ''
     ].filter(Boolean), { stdio: 'inherit', shell: true });
 
@@ -52,17 +59,17 @@ export default function VitePlugin(options?: {
         name: VITE_PLUGIN_VUE_TSC_CHECKER,
         configureServer({ watcher, ws, restart }: ViteDevServer) {
             if (devTsc) {
-                devTsc?.kill();
+                devTsc.kill?.();
             }
             devTsc = script(true);
             devTsc.on('message', (error: any) => {
                 if (error) {
-                    ws.send({
+                    ws?.send?.({
                         type: 'error',
                         err: error,
                     });
                 } else {
-                    ws.send({
+                    ws?.send?.({
                         type: 'update',
                         updates: [],
                     });
@@ -96,7 +103,11 @@ export default function VitePlugin(options?: {
                 devTsc?.send({ deleteFile: path });
             });
             watcher.on('error', () => {
-                devTsc?.kill();
+                devTsc?.kill?.();
+                devTsc = null;
+            });
+            process.on('exit', () => {
+                devTsc?.kill?.();
                 devTsc = null;
             });
         },

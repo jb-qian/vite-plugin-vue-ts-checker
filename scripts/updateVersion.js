@@ -1,9 +1,17 @@
 const fs = require('fs-extra');
-const { execSync } = require('child_process');
+const { exec } = require('child_process');
 const { npmPath, moduleName, registry } = require('./const');
 
 function installVersion(version) {
-    return execSync(`npm i ${moduleName}@${version} --registry ${registry}`, { shell: true, cwd: npmPath });
+    return new Promise((resolve, reject) => {
+        exec(`npm i ${moduleName}@${version} --registry ${registry}`, { shell: true, cwd: npmPath }, (err, data) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve();
+            }
+        });
+    });
 }
 
 module.exports = {
