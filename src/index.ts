@@ -2,10 +2,22 @@ import { ViteDevServer } from 'vite';
 import { ChildProcess, fork, spawnSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
-import { CHECKER_JSON_FILENAME, VITE_PLUGIN_VUE_TSC_CHECKER } from './const';
+import { CHECKER_JSON_FILENAME, clearConsole, VITE_PLUGIN_VUE_TSC_CHECKER } from './const';
 
-import { dirname } from 'path'
-import { fileURLToPath } from 'url'
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+import * as chalk from 'chalk';
+
+export function outputSuccessMessage(host: string, port: string) {
+    clearConsole();
+    process.stdout.write(
+        `${chalk.green('Check successfully!')}\n\n` +
+        `${chalk.gray('You can now view project in the browser.')}\n\n` +
+        `${chalk.green('  ➜')} ${chalk.gray('Local:')}   ${chalk.cyan(`http://localhost:${host}`)}\n` +
+        `${chalk.green('  ➜')} ${chalk.gray('Network:')} ${chalk.cyan(`http://172.18.108.11:${host}/`)}\n\n` +
+        `${chalk.green('No issues found.')}\n`
+    );
+}
 
 const _dirname = typeof __dirname !== 'undefined'
   ? __dirname
@@ -34,7 +46,7 @@ const script = (isWatch: boolean) => {
             hasCheckerJson ? CHECKER_JSON_FILENAME : 'tsconfig.json',
             isWatch ? '--watch' : '',
             '--noEmit',
-            '--pretty'
+            '--pretty',
         ].filter(Boolean),
         {
             stdio: 'inherit',
@@ -57,10 +69,14 @@ export default function VitePlugin(options?: {
 
     return {
         name: VITE_PLUGIN_VUE_TSC_CHECKER,
-        configureServer({ watcher, ws, restart }: ViteDevServer) {
+        configureServer(server: ViteDevServer) {
+            const { watcher, ws, restart } = server;
             if (devTsc) {
                 devTsc.kill?.();
             }
+            setTimeout(() => {
+                devTsc?.emit('port', server?.httpServer?.address());
+            });
             devTsc = script(true);
             devTsc.on('message', (error: any) => {
                 if (error) {
@@ -73,6 +89,7 @@ export default function VitePlugin(options?: {
                         type: 'update',
                         updates: [],
                     });
+                    outputSuccessMessage(server);
                 }
             });
             // 新增跟修改保持一致

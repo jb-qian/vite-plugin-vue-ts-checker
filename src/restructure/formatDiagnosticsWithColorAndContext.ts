@@ -16,7 +16,6 @@ export enum ForegroundColorEscapeSequences {
     Grey = "\u001b[90m",
     Red = "\u001b[91m",
     Yellow = "\u001B[33m",
-    Blue = "\u001b[35m",
     Cyan = "\u001B[36m"
 }
 

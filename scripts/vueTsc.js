@@ -28,6 +28,10 @@ process.on('message', (data) => {
     }
 });
 
+process.on('port', (port) => {
+    console.log('port', port);
+});
+
 function addVueFilesToAllowExtensions(tsc, proxyPath) {
     // add *.vue files to allow extensions
     tsc = tsc.replace(

@@ -1,4 +1,5 @@
 import * as ts from 'typescript/lib/tsserverlibrary';
+import { clearConsole } from '../const';
 
 const screenStartingMessageCodes = [
     6031,
@@ -15,12 +16,6 @@ function contains(array: number[], value: number) {
         }
     }
     return false;
-}
-
-export function clearConsole() {
-    process.stdout.write(
-        process.platform === 'win32' ? '\x1B[2J\x1B[0f' : '\x1B[2J\x1B[3J\x1B[H'
-    );
 }
 
 function clearScreenIfNotWatchingForFileChanges(diagnostic: ts.Diagnostic, options: ts.CompilerOptions) {
@@ -43,10 +38,13 @@ export default function createWatchStatusReporter(system: ts.System, pretty: boo
             clearScreenIfNotWatchingForFileChanges(diagnostic, options);
             let output = '';
             output += ''.concat(ts.flattenDiagnosticMessageText(diagnostic.messageText, system.newLine)).concat(newLine + newLine);
-            system.write(output);
             // 0 错误结束
-            if (Number(output.match(/Found\s*(\d+)\s*error/)?.[1] || 0) === 0) {
+            const errorCount = output.match(/Found\s*(\d+)\s*error/)?.[1];
+            if (errorCount === '0') {
                 process.send?.('');
+                // outputSuccessMessage(system);
+            } else {
+                system.write(output);
             }
         } :
         function (diagnostic: ts.Diagnostic, newLine: string, options: ts.CompilerOptions) {
@@ -55,9 +53,13 @@ export default function createWatchStatusReporter(system: ts.System, pretty: boo
                 output += newLine;
             }
             output += ''.concat(ts.flattenDiagnosticMessageText(diagnostic.messageText, system.newLine)).concat(getPlainDiagnosticFollowingNewLines(diagnostic, newLine));
-            system.write(output);
-            if (Number(output.match(/Found\s*(\d+)\s*error/)?.[1] || 0) === 0) {
+            // 0 错误结束
+            const errorCount = output.match(/Found\s*(\d+)\s*error/)?.[1];
+            if (errorCount === '0') {
                 process.send?.('');
+                // outputSuccessMessage(system);
+            } else {
+                system.write(output);
             }
         };
 }
