@@ -3,3 +3,5 @@ src
 vue-ts-checker-npm-modules
 package-lock.json
 tsconfig.json
+
+publish*.sh

@@ -1,7 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const { exec } = require('child_process');
-const { npmPath, moduleName, registry } = require('./const');
+const { npmPath, moduleName } = require('./const');
 
 function stringToArray(str) {
     try {
@@ -27,7 +27,7 @@ function getOriginVersion(lockVersion) {
         if (lockVersion) {
             return resolve(lockVersion);
         }
-        exec(`npm view ${moduleName} versions --json --registry ${registry}`, { shell: true }, (err, data) => {
+        exec(`npm view ${moduleName} versions --json`, { shell: true }, (err, data) => {
             if (err) {
                 reject(err);
             } else {
