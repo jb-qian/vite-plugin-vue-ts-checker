@@ -6,15 +6,16 @@ import { CHECKER_JSON_FILENAME, clearConsole, VITE_PLUGIN_VUE_TSC_CHECKER } from
 
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
-import * as chalk from 'chalk';
+import chalk from 'chalk';
+import ip from 'ip';
 
-export function outputSuccessMessage(host: string, port: string) {
+export function outputSuccessMessage(host: string, port = 5173) {
     clearConsole();
     process.stdout.write(
         `${chalk.green('Check successfully!')}\n\n` +
         `${chalk.gray('You can now view project in the browser.')}\n\n` +
-        `${chalk.green('  ➜')} ${chalk.gray('Local:')}   ${chalk.cyan(`http://localhost:${host}`)}\n` +
-        `${chalk.green('  ➜')} ${chalk.gray('Network:')} ${chalk.cyan(`http://172.18.108.11:${host}/`)}\n\n` +
+        `${chalk.green('  ➜')} ${chalk.gray('Local:')}   ${chalk.cyan(`http://localhost:${port}`)}\n` +
+        `${chalk.green('  ➜')} ${chalk.gray('Network:')} ${chalk.cyan(`http://${host}:${port}/`)}\n\n` +
         `${chalk.green('No issues found.')}\n`
     );
 }
@@ -40,7 +41,7 @@ const isTransformFile = (path: string) => {
 const script = (isWatch: boolean) => {
     const hasCheckerJson = fs.existsSync(path.join(process.cwd(), CHECKER_JSON_FILENAME));
     return fork(
-        path.join(_dirname, '../scripts/vueTsc.js'),
+        path.join(_dirname, '../vue-ts-checker-npm-modules/node_modules/.bin/vue-tsc'),
         [
             '-p',
             hasCheckerJson ? CHECKER_JSON_FILENAME : 'tsconfig.json',
@@ -67,6 +68,11 @@ export default function VitePlugin(options?: {
         options?.volar.version ? `--version=${options.volar.version}` : ''
     ].filter(Boolean), { stdio: 'inherit', shell: true });
 
+    // 替换脚本
+    spawnSync('node', [
+        path.join(_dirname, '../scripts/replace.js')
+    ], { stdio: 'inherit', shell: true });
+
     return {
         name: VITE_PLUGIN_VUE_TSC_CHECKER,
         configureServer(server: ViteDevServer) {
@@ -74,9 +80,6 @@ export default function VitePlugin(options?: {
             if (devTsc) {
                 devTsc.kill?.();
             }
-            setTimeout(() => {
-                devTsc?.emit('port', server?.httpServer?.address());
-            });
             devTsc = script(true);
             devTsc.on('message', (error: any) => {
                 if (error) {
@@ -89,7 +92,8 @@ export default function VitePlugin(options?: {
                         type: 'update',
                         updates: [],
                     });
-                    outputSuccessMessage(server);
+                    // 输出 ip 信息
+                    outputSuccessMessage(ip.address(), server.config.server.port);
                 }
             });
             // 新增跟修改保持一致
@@ -101,24 +105,12 @@ export default function VitePlugin(options?: {
                     restart();
                     return;
                 }
-                // 过滤文件
-                if (!isTransformFile(path)) {
-                    return;
-                }
-                devTsc?.send({ changeFile: path });
             }
             // 添加
             watcher.on('add', onChange);
             // 改变
             watcher.on('change', onChange);
-            // 删除
-            watcher.on('unlink', (path: string) => {
-                // 过滤文件
-                if (!isTransformFile(path)) {
-                    return;
-                }
-                devTsc?.send({ deleteFile: path });
-            });
+            // 报错
             watcher.on('error', () => {
                 devTsc?.kill?.();
                 devTsc = null;
@@ -141,7 +133,6 @@ export default function VitePlugin(options?: {
                         resolve();
                     } else {
                         process.exit(1);
-                        reject();
                     }
                 })
             });

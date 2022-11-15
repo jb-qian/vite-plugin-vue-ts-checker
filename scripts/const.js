@@ -6,11 +6,8 @@ const typescriptPath = path.join(npmPath, 'node_modules/typescript');
 
 const moduleName = 'vue-tsc';
 
-const registry = 'https://registry.npmjs.org';
-
 module.exports = {
     npmPath,
     typescriptPath,
     moduleName,
-    registry,
 }
