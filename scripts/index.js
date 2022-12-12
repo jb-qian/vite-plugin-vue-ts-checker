@@ -34,7 +34,7 @@ const {
 
 Promise.all([
     getLocalVersion(),
-    getOriginVersion(params.version),
+    params.version ? Promise.resolve(params.version) : getOriginVersion(params.version),
 ]).then(([localVersion, originVersion]) => {
     spinner.clear();
     // 没有远程版本，直接跳出
@@ -72,7 +72,7 @@ function install(version) {
     }).then(() => {
         return createNpmPackage();
     }).then(() => {
-        return installVersion(version);
+        return installVersion(version, params.registry);
     }).then(() => {
         // 删掉 后来安装依赖的 ts 目录，使用项目下的 ts
         return fs.remove(typescriptPath);
