@@ -15,7 +15,7 @@ export function outputSuccessMessage(host: string, port = 5173) {
         `${chalk.green('Check successfully!')}\n\n` +
         `${chalk.gray('You can now view project in the browser.')}\n\n` +
         `${chalk.green('  ➜')} ${chalk.gray('Local:')}   ${chalk.cyan(`http://localhost:${port}`)}\n` +
-        `${chalk.green('  ➜')} ${chalk.gray('Network:')} ${chalk.cyan(`http://${host}:${port}/`)}\n\n` +
+        `${chalk.green('  ➜')} ${chalk.gray('Network:')} ${chalk.cyan(`http://${host}:${port}`)}\n\n` +
         `${chalk.green('No issues found.')}\n`
     );
 }
@@ -59,13 +59,15 @@ let devTsc: ChildProcess | null = null;
 
 export default function VitePlugin(options?: {
     volar: {
-        version: string,
+        version: string;
+        registry: string;
     }
 }) {
     // 检查版本
     spawnSync('node', [
         path.join(_dirname, '../scripts/index.js'),
-        options?.volar.version ? `--version=${options.volar.version}` : ''
+        options?.volar.version ? `--version=${options.volar.version}` : '',
+        options?.volar.registry ? `--registry=${options.volar.registry}` : '',
     ].filter(Boolean), { stdio: 'inherit', shell: true });
 
     // 替换脚本
