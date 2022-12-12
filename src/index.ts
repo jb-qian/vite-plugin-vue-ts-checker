@@ -60,14 +60,14 @@ let devTsc: ChildProcess | null = null;
 export default function VitePlugin(options?: {
     volar: {
         version: string;
-        registry: string;
     }
+    registry: string;
 }) {
     // 检查版本
     spawnSync('node', [
         path.join(_dirname, '../scripts/index.js'),
         options?.volar.version ? `--version=${options.volar.version}` : '',
-        options?.volar.registry ? `--registry=${options.volar.registry}` : '',
+        options?.registry ? `--registry=${options.registry}` : '',
     ].filter(Boolean), { stdio: 'inherit', shell: true });
 
     // 替换脚本
