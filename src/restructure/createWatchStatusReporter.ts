@@ -42,8 +42,9 @@ export default function createWatchStatusReporter(system: ts.System, pretty: boo
             const errorCount = output.match(/Found\s*(\d+)\s*error/)?.[1];
             if (errorCount === '0') {
                 process.send?.('');
+            } else {
+                system.write(output);
             }
-            system.write(output);
         } :
         function (diagnostic: ts.Diagnostic, newLine: string, options: ts.CompilerOptions) {
             let output = '';
@@ -55,7 +56,8 @@ export default function createWatchStatusReporter(system: ts.System, pretty: boo
             const errorCount = output.match(/Found\s*(\d+)\s*error/)?.[1];
             if (errorCount === '0') {
                 process.send?.('');
+            } else {
+                system.write(output);
             }
-            system.write(output);
         };
 }

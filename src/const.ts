@@ -1,4 +1,5 @@
 import { ErrorPayload } from 'vite';
+import readline from 'readline';
 
 export const VITE_PLUGIN_VUE_TSC_CHECKER = 'vite-plugin-vue-ts-checker';
 
@@ -28,8 +29,14 @@ export function viteError(config: Config): ErrorPayload['err'] {
     }
 }
 
-export function clearConsole() {
-    process.stdout.write(
-        process.platform === 'win32' ? '\x1B[2J\x1B[0f' : '\x1B[2J\x1B[3J\x1B[H'
-    );
+export function clearConsole(title = '') {
+    if (process.stdout.isTTY) {
+        const blank = '\n'.repeat(process.stdout.rows);
+        console.log(blank);
+        readline.cursorTo(process.stdout, 0, 0);
+        readline.clearScreenDown(process.stdout);
+        if (title) {
+            console.log(title);
+        }
+    }
 }
