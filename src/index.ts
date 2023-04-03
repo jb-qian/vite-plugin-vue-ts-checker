@@ -9,13 +9,13 @@ import { fileURLToPath } from 'url';
 import chalk from 'chalk';
 import ip from 'ip';
 
-export function outputSuccessMessage(host: string, port = 5173) {
+export function outputSuccessMessage(host: { ip: string, local: string }, port = 5173, https = false) {
     clearConsole();
     process.stdout.write(
         `${chalk.green('Check successfully!')}\n\n` +
         `${chalk.gray('You can now view project in the browser.')}\n\n` +
-        `${chalk.green('  ➜')} ${chalk.gray('Local:')}   ${chalk.cyan(`http://localhost:${port}`)}\n` +
-        `${chalk.green('  ➜')} ${chalk.gray('Network:')} ${chalk.cyan(`http://${host}:${port}`)}\n\n` +
+        `${chalk.green('  ➜')} ${chalk.gray('Local:')}   ${chalk.cyan(`${https ? 'https' : 'http'}://${host.local}:${port}`)}\n` +
+        `${chalk.green('  ➜')} ${chalk.gray('Network:')} ${chalk.cyan(`${https ? 'https' : 'http'}://${host.ip}:${port}`)}\n\n` +
         `${chalk.green('No issues found.')}\n`
     );
 }
@@ -94,8 +94,9 @@ export default function VitePlugin(options?: {
                         type: 'update',
                         updates: [],
                     });
+                    const host = server.config.server.host;
                     // 输出 ip 信息
-                    outputSuccessMessage(ip.address(), server.config.server.port);
+                    outputSuccessMessage({ ip: ip.address(), local: typeof host === 'string' ? (host || 'localhost') : 'localhost' }, server.config.server.port);
                 }
             });
             // 新增跟修改保持一致
