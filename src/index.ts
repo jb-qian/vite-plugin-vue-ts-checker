@@ -96,7 +96,7 @@ export default function VitePlugin(options?: {
                     });
                     const host = server.config.server.host;
                     // 输出 ip 信息
-                    outputSuccessMessage({ ip: ip.address(), local: typeof host === 'string' ? (host || 'localhost') : 'localhost' }, server.config.server.port);
+                    outputSuccessMessage({ ip: ip.address(), local: typeof host === 'string' ? (host || 'localhost') : 'localhost' }, server.config.server.port, !!server.config.server.https);
                 }
             });
             // 新增跟修改保持一致
