@@ -4,7 +4,7 @@ const ora = require('ora');
 const chalk = require('chalk');
 
 const createNpmPackage = require('./createNpmPackage');
-const { npmPath, typescriptPath, moduleName } = require('./const');
+const { getNpmPath, getTypescriptPath, moduleName } = require('./const');
 const {
     installing,
     installSuccess,
@@ -33,7 +33,7 @@ const {
 } = require('./updateVersion');
 
 Promise.all([
-    getLocalVersion(),
+    getLocalVersion(params.version),
     params.version ? Promise.resolve(params.version) : getOriginVersion(params.version),
 ]).then(([localVersion, originVersion]) => {
     spinner.clear();
@@ -67,14 +67,16 @@ Promise.all([
 });
 
 function install(version) {
-    return fs.remove(npmPath).finally(() => {
-        return fs.mkdir(npmPath);
-    }).then(() => {
-        return createNpmPackage();
+    const _npmPath = getNpmPath(version);
+    if (fs.existsSync(_npmPath)) {
+        return Promise.resolve();
+    }
+    return fs.emptyDir(_npmPath).then(() => {
+        return createNpmPackage(version);
     }).then(() => {
         return installVersion(version, params.registry);
     }).then(() => {
         // 删掉 后来安装依赖的 ts 目录，使用项目下的 ts
-        return fs.remove(typescriptPath);
+        return fs.remove(getTypescriptPath(version));
     });
 }

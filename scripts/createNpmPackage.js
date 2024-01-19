@@ -1,9 +1,9 @@
 const { exec } = require('child_process');
-const { npmPath } = require('./const');
+const { getNpmPath } = require('./const');
 
-function createNpmPackage() {
+function createNpmPackage(version) {
     return new Promise((resolve, reject) => {
-        exec(`cd ${npmPath} && npm init -y`, { shell: true }, (err, data) => {
+        exec(`cd ${getNpmPath(version)} && npm init -y`, { shell: true }, (err, data) => {
             if (err) {
                 reject(err);
             } else {

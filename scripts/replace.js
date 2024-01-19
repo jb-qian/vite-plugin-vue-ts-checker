@@ -1,5 +1,14 @@
 const fs = require('fs');
 const path = require('path');
+const { getNpmPath } = require('./const')
+
+// 简单写一个获取参数
+const params = process.argv.slice(2).reduce((prev, current) => {
+    const [key, value] = current.split('=');
+    prev[key.replace(/^-+/, '')] = value ?? true;
+    return prev;
+}, {});
+
 
 const formatDiagnosticsWithColorAndContextPath = require.resolve('../dist/restructure/formatDiagnosticsWithColorAndContext');
 const createWatchStatusReporterPath = require.resolve('../dist/restructure/createWatchStatusReporter');
@@ -21,7 +30,7 @@ function addVueFilesToAllowExtensions() {
     `
 }
 
-const vueTsc = path.join(__dirname, '../vue-ts-checker-npm-modules/node_modules/vue-tsc/bin/vue-tsc.js');
+const vueTsc = path.join(getNpmPath(params.version), 'node_modules/vue-tsc/bin/vue-tsc.js');
 const vueTscData = fs.readFileSync(vueTsc).toString();
 // 如果没有替换
 if (!vueTscData.includes('replaceFormatDiagnosticsWithColorAndContext')) {

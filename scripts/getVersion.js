@@ -1,7 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const { exec } = require('child_process');
-const { npmPath, moduleName } = require('./const');
+const { getNpmPath, moduleName } = require('./const');
 
 function stringToArray(str) {
     try {
@@ -11,9 +11,9 @@ function stringToArray(str) {
     }
 }
 
-function getLocalVersion() {
+function getLocalVersion(version) {
     return new Promise((resolve) => {
-        const package = path.join(npmPath, `node_modules/${moduleName}/package.json`);
+        const package = path.join(getNpmPath(version), `node_modules/${moduleName}/package.json`);
         if (!fs.pathExistsSync(package)) {
             resolve(undefined);
             return;

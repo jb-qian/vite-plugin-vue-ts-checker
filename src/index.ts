@@ -38,10 +38,13 @@ const isTransformFile = (path: string) => {
  * @param watch watch 模式
  * @returns ChildProcess
  */
-const script = (isWatch: boolean) => {
-    const hasCheckerJson = fs.existsSync(path.join(process.cwd(), CHECKER_JSON_FILENAME));
+const script = (isWatch: boolean, version?: string) => {
+    const cwd = process.cwd();
+    const packageName = cwd.split('/').pop();
+    const hasCheckerJson = fs.existsSync(path.join(cwd, CHECKER_JSON_FILENAME));
+    // version 拼接待优化
     return fork(
-        path.join(_dirname, '../vue-ts-checker-npm-modules/node_modules/.bin/vue-tsc'),
+        path.join(_dirname, `../vue-ts-checker-npm-modules/${packageName}/${version}/node_modules/.bin/vue-tsc`),
         [
             '-p',
             hasCheckerJson ? CHECKER_JSON_FILENAME : 'tsconfig.json',
@@ -63,17 +66,19 @@ export default function VitePlugin(options?: {
     }
     registry: string;
 }) {
+    const version = options?.volar.version;
     // 检查版本
     spawnSync('node', [
         path.join(_dirname, '../scripts/index.js'),
-        options?.volar.version ? `--version=${options.volar.version}` : '',
+        version ? `--version=${version}` : '',
         options?.registry ? `--registry=${options.registry}` : '',
     ].filter(Boolean), { stdio: 'inherit', shell: true });
 
     // 替换脚本
     spawnSync('node', [
-        path.join(_dirname, '../scripts/replace.js')
-    ], { stdio: 'inherit', shell: true });
+        path.join(_dirname, '../scripts/replace.js'),
+        version ? `--version=${version}` : '',
+    ].filter(Boolean), { stdio: 'inherit', shell: true });
 
     return {
         name: VITE_PLUGIN_VUE_TSC_CHECKER,
@@ -82,7 +87,7 @@ export default function VitePlugin(options?: {
             if (devTsc) {
                 devTsc.kill?.();
             }
-            devTsc = script(true);
+            devTsc = script(true, version);
             devTsc.on('message', (error: any) => {
                 if (error) {
                     ws?.send?.({
@@ -130,7 +135,7 @@ export default function VitePlugin(options?: {
             }
             // build
             return new Promise<void>((resolve, reject) => {
-                const child = script(false);
+                const child = script(false, version);
                 child.on('close', code => {
                     if (code === 0) {
                         resolve();
